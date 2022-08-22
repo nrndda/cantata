@@ -1,7 +1,7 @@
 Cantata
 =======
 
-**NOTE** This fork includes extra features like automatic encoding detection using [uchardet](https://github.com/freedesktop/uchardet) and more advanced CUE playlist parser (WIP)
+**NOTE** This fork includes extra fixes and features like automatic encoding detection using [uchardet](https://github.com/freedesktop/uchardet) and more advanced CUE playlist parser (WIP)
 
 ![ScreenShot](screenshots/mainwindow.png)
 
