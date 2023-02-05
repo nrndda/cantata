@@ -1,6 +1,10 @@
 include_directories(${QTINCLUDES} ${TAGLIB_INCLUDES} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 set(CANTATA_TAGS_SRCS main.cpp taghelper.cpp tags.cpp filetyperesolver.cpp ../mpd-interface/song.cpp)
 
+if(UCHARDET_FOUND)
+    set(CANTATA_TAGS_SRCS ${CANTATA_TAGS_SRCS} ../support/uchardet.cpp)
+endif()
+
 if (WIN32)
     set(CMAKE_BUILD_TYPE "Release")
     ADD_EXECUTABLE(cantata-tags WIN32 ${CANTATA_TAGS_SRCS})
@@ -19,4 +23,8 @@ target_link_libraries(cantata-tags ${TAGLIB_LIBRARIES} ${QTGUILIBS} ${QTCORELIBS
 if (TAGLIB-EXTRAS_FOUND)
     target_link_libraries(cantata-tags ${TAGLIB-EXTRAS_LIBRARIES})
     include_directories(${TAGLIB-EXTRAS_INCLUDES})
+endif ()
+if(UCHARDET_FOUND)
+    target_link_libraries(cantata-tags ${UCHARDET_LIBS})
+    include_directories(${UCHARDET_INCLUDE_DIR})
 endif ()

@@ -1,3 +1,10 @@
+2.5.x
+-----
+ 1. uchardet detection integrated, this fixes library view with "???.."
+ 2. CUE playlist parser fix - FILE section now working correctly.
+ 3. Audio source file existance check from FILE section of CUE file.
+ 4. CUE parser optimizations.
+
 2.5.0
 -----
  1. Update translations.

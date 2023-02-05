@@ -193,10 +193,19 @@ void SqlLibraryModel::libraryUpdated()
             QMap<QString, int> knownCats;
             for (const LibraryDb::Album &album: albums) {
                 QString name;
+                QString nameList = album.name;
+                QString sortList = album.sort;
                 switch(albumSort) {
                 case LibraryDb::AS_AlArYr:
                 case LibraryDb::AS_AlYrAr:
-                    name=album.sort.isEmpty() ? album.name.at(0).toUpper() : album.sort.at(0).toUpper();
+                    //qWarning() << album.name;
+                    nameList = album.name;
+                    sortList = album.sort;
+                    if(sortList.isEmpty()) {
+                        name = nameList.front().toUpper();
+                    } else {
+                        name = sortList.front().toUpper();
+                    }
                     break;
                 default:
                 case LibraryDb::AS_ArAlYr:

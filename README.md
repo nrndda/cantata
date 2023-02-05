@@ -1,7 +1,7 @@
 Cantata
 =======
 
-**NOTE** After 10 years, development of Cantata has now ceased, and this repository is read-only. v2.5.0 is the last released version.
+**NOTE** This fork includes extra features like automatic encoding detection using [uchardet](https://github.com/freedesktop/uchardet) and more advanced CUE playlist parser (WIP)
 
 ![ScreenShot](screenshots/mainwindow.png)
 
@@ -30,10 +30,4 @@ A graphical (Qt5) client for MPD, supporting the following features:
 Cantata started off as a fork of QtMPC, however, the code (and user interface) is now *very* different to that of QtMPC.
 For more detailed information, please refer to the main [README](https://raw.githubusercontent.com/CDrummond/cantata/master/README)
 
-
-## Donations
-
-I develop Cantata purely for fun, so no donations are required. However, seeing as I have been asked about this a few times, here is a link...
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2X2CTDUH27V9L&source=url)
 

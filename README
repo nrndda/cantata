@@ -92,6 +92,7 @@ Cantata may also use the following optional libraries:
 8. LibEbur128 - ReplayGain detection code. If this is not found on the
    system then Cantata will use its own bundled copy.
 9. libavahi-common / libavahi-client - Avahi support (automatic mpd discovery)
+10. uchardet - automatic encoding detection
 
 
 3. Building

@@ -45,6 +45,7 @@ include(CPack)
 include(MacroLogFeature)
 
 option(ENABLE_TAGLIB "Enable TagLib library (required for tag editing, replaygain calculation, device support, etc)" ON)
+option(ENABLE_UCHARDET "Enable CUE playlists charset discovery via app-i18n/uchardet" ON)
 option(ENABLE_HTTP_STREAM_PLAYBACK "Enable playback of MPD HTTP streams (LibVLC or QtMultimedia)" ON)
 option(ENABLE_FFMPEG "Enable ffmpeg/libav libraries (required for replaygain calculation)" ON)
 option(ENABLE_MPG123 "Enable mpg123 libraries (required for replaygain calculation)" ON)
@@ -192,6 +193,15 @@ endif ()
 if (NOT MTP_FOUND)
    set(ENABLE_UNCACHED_MTP OFF)
 endif ()
+
+if (ENABLE_UCHARDET)
+    find_package(UCHARDET REQUIRED)
+    macro_log_feature(UCHARDET_FOUND "uchardet" "An encoding detector library" "https://www.freedesktop.org/wiki/Software/uchardet/")
+    include_directories(${UCHARDET_INCLUDE_DIR})
+    set(CANTATA_LIBS ${CANTATA_LIBS} ${UCHARDET_LIBS})
+    set(CANTATA_SRCS ${CANTATA_SRCS} support/uchardet.cpp)
+endif ()
+
 
 find_package(Qt5 ${QT_MIN_VERSION} COMPONENTS Widgets Xml Network Concurrent Svg Sql REQUIRED)
 

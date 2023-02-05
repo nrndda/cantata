@@ -24,6 +24,7 @@
 #include "cuefile.h"
 #include "mpdconnection.h"
 #include "support/utils.h"
+#include "models/playqueuemodel.h"
 #include <QBuffer>
 #include <QDateTime>
 #include <QFile>
@@ -38,6 +39,9 @@
 #include <QUrl>
 #include <QUrlQuery>
 #include <QObject>
+#ifdef UCHARDET_FOUND
+#include "support/uchardet.h"
+#endif
 
 #include <QDebug>
 static bool debugEnabled=false;
@@ -184,6 +188,8 @@ static inline bool isVariousArtists(const QString &str)
     return QLatin1String("various") == lower || QLatin1String("various artists") == lower;
 }
 
+
+
 // Parse CUE file content
 //
 // Supported CUE tags                       | corresponding MPD tags
@@ -250,11 +256,25 @@ bool CueFile::parse(const QString &fileName, const QString &dir, QList<Song> &so
     // CUE file stream
     QScopedPointer<QTextStream> textStream;
     QString decoded;
+    const char *uchardetCodec;
     QFile f(dir+fileName);
     if (f.open(QIODevice::ReadOnly)) {
         // First attempt to use QTextDecoder to decode cue file contents into a QString
         QByteArray contents=f.readAll();
-        for (QTextCodec *codec: codecList()) {
+        #ifdef UCHARDET_FOUND 
+        uchardetCodec = UCHARDET::detectedEncoding(contents);
+        if (uchardetCodec != NULL) {
+            DBUG << "uchardet decoder: " << uchardetCodec;
+            QTextDecoder advDecoder(QTextCodec::codecForName(uchardetCodec));
+            DBUG << UCHARDET::detectedEncoding(contents);
+            decoded=advDecoder.toUnicode(contents);
+            if (!advDecoder.hasFailure()) {
+                textStream.reset(new QTextStream(&decoded, QIODevice::ReadOnly));
+            }
+        } else {
+            DBUG << "Using default set of decoders";
+        #endif
+        for (QTextCodec *codec: codecList()) { 
             QTextDecoder decoder(codec);
             decoded=decoder.toUnicode(contents);
             if (!decoder.hasFailure()) {
@@ -262,6 +282,9 @@ bool CueFile::parse(const QString &fileName, const QString &dir, QList<Song> &so
                 break;
             }
         }
+        #ifdef UCHARDET_FOUND
+        }
+        #endif
         f.close();
 
         if (!textStream) {
@@ -269,7 +292,19 @@ bool CueFile::parse(const QString &fileName, const QString &dir, QList<Song> &so
             // Failed to use text decoders, fall back to old method...
             f.open(QIODevice::ReadOnly|QIODevice::Text);
             textStream.reset(new QTextStream(&f));
+            #ifdef UCHARDET_FOUND
+            uchardetCodec = UCHARDET::detectedEncoding(contents);
+            if (uchardetCodec != NULL) {
+                QTextCodec *anotherCodec=QTextCodec::codecForName(UCHARDET::detectedEncoding(f.peek(1024)));
+                textStream->setCodec(anotherCodec);
+                DBUG << "Failed to use text decoders, fall back to old method, using uchardet: " << uchardetCodec;
+            } else {
+                DBUG << "uchardet codec detection failed!";
+            #endif
             textStream->setCodec(QTextCodec::codecForUtfText(f.peek(1024), QTextCodec::codecForName("UTF-8")));
+            #ifdef UCHARDET_FOUND
+            }
+            #endif
         }
     }
 
@@ -349,13 +384,58 @@ bool CueFile::parse(const QString &fileName, const QString &dir, QList<Song> &so
             if (!cmdVal.isEmpty()) {
                 cmdVal.remove('"').remove("'");
                 QStringList cmdValSplitted = cmdVal.split(QRegExp("\\s+"));
-                if (cmdValSplitted.size() == 2) {
-                    file = cmdValSplitted[0].remove("\"");  // file audio: name
-                    fileType = cmdValSplitted[1];           // file audio: type
+                DBUG << cmdValSplitted;
+                QStringList listForName(cmdValSplitted[0].remove("\""));
+                if (cmdValSplitted.size() - 1 > 0) {
+                    for (int i = 1; i < cmdValSplitted.size() - 1; i++) {
+                        listForName += cmdValSplitted[i].remove("\"");
+                    }
+                    file = listForName.join(" ");                   // file audio: name
+                    DBUG << "File audio name: " << file;
                 }
+                fileType = cmdValSplitted[cmdValSplitted.size()-1]; // file audio: type
+                DBUG << "File audio type: " << fileType;
             }
             // check if is a valid audio file (else if this is a data file, all of its tracks will be ignored...)
             isValidFile = fileType.compare("BINARY", Qt::CaseInsensitive) && fileType.compare("MOTOROLA", Qt::CaseInsensitive);
+
+            // check if file exists and if it doesn't, check if there is file with another extension
+            QString ext;
+            QString fe(file);
+            
+            if (!file.isEmpty()) {
+                int dotPos=fe.lastIndexOf('.');
+                if (-1!=dotPos) {
+                    ext = fe.mid(dotPos+1).toLower();
+                } else {
+                    DBUG << "Index not found in: " << fe;
+                }
+                DBUG << "Extension: " << ext;
+                DBUG << "Extension check: " << PlayQueueModel::constFileExtensions.contains(ext);
+                if (PlayQueueModel::constFileExtensions.contains(ext) && 
+                        !QFile::exists(Utils::getDir(dir+fileName)+file)) {
+                    DBUG << "CUE source file doesn't exist: " << Utils::getDir(dir+fileName)+file;
+                    QDir sDir(Utils::getDir(dir+fileName));
+                    DBUG << "List for: " << Utils::changeExtension(Utils::getFile(file), ".*");
+                    QFileInfoList files = sDir.entryInfoList(QStringList() << Utils::changeExtension(Utils::getFile(file), ".*"), QDir::NoDotAndDotDot | QDir::AllEntries);
+                    DBUG << "QFileInfoList files: " << files;
+                    for (const auto &anotherFile : files) {
+                        if(PlayQueueModel::constFileExtensions.contains(anotherFile.suffix().toLower())) {
+                            QString destFile = anotherFile.fileName();
+                            DBUG << "Another file: " << destFile;
+                            file = destFile;
+                            break;
+                        }
+                    }
+                    if(!QFile::exists(Utils::getDir(dir+fileName)+file)){     
+                        DBUG << "CUE audio source not found!";
+                        return false;
+                    }
+                } else DBUG << "CUE source file exist: " << dir+file;
+            } else {
+                DBUG << "file is not specified in " << dir+fileName;
+                return false;
+            }
 
             DBUG << "FILE: file:" << file << ", fileType:" << fileType << ", fileValid?" << isValidFile;
             DBUG << "HEADER: genre:" << genre << ", album:" << album << ", discNo:" << discNo << ", year:" << date << ", originalYear:" << origYear
@@ -537,6 +617,7 @@ bool CueFile::parse(const QString &fileName, const QString &dir, QList<Song> &so
 
     // check if the CUE file has valid tracks...
     if (tracks.size() == 0) {
+        DBUG << "tracks size is zero";
         return false;
     }
 

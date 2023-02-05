@@ -81,6 +81,9 @@
 #include <taglib/attachedpictureframe.h>
 #include <taglib/unsynchronizedlyricsframe.h>
 #include <taglib/popularimeterframe.h>
+#ifdef UCHARDET_FOUND
+#include "support/uchardet.h"
+#endif
 
 // loundess-scanner defines this as 5.0? But on tests with MPD 0.20.21 with FLAC and OPUS
 // then using 0 made playback the same
@@ -100,7 +103,18 @@ void enableDebug()
 
 static QString tString2QString(const TagLib::String &str)
 {
-    static QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QTextCodec *codec;
+    #ifdef UCHARDET_FOUND
+    QByteArray contents(str.toCString(true));
+    const char *uchardetCodec(UCHARDET::detectedEncoding(contents));
+    if (uchardetCodec != NULL) {
+        codec = QTextCodec::codecForName(uchardetCodec);
+    } else {
+    #endif
+        codec = QTextCodec::codecForName("UTF-8");
+    #ifdef UCHARDET_FOUND
+    }
+    #endif
     return codec->toUnicode(str.toCString(true)).trimmed();
 }
 

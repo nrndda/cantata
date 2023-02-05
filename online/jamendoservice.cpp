@@ -34,12 +34,26 @@
 
 #ifdef TAGLIB_FOUND
 
+#ifdef UCHARDET_FOUND
+#include "support/uchardet.h"
+#endif
+
 #include <taglib/tstring.h>
 #include <taglib/id3v1genres.h>
 #include <QTextCodec>
 static QString id3Genre(int id)
 {
-    static QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QTextCodec *codec;
+    #ifdef UCHARDET_FOUND
+    static const char *uchardetCodec = UCHARDET::detectedEncoding(TagLib::ID3v1::genre(id).toCString(true));
+    if (uchardetCodec != NULL) {
+        codec = QTextCodec::codecForName(uchardetCodec);
+    } else {
+    #endif
+    codec = QTextCodec::codecForName("UTF-8");
+    #ifdef UCHARDET_FOUND
+    }
+    #endif
     // Clementine: In theory, genre 0 is "blues"; in practice it's invalid.
     return 0==id ? QString() : codec->toUnicode(TagLib::ID3v1::genre(id).toCString(true)).trimmed();
 }

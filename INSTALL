@@ -87,6 +87,10 @@ The following options may be passed to CMake:
         Enable avahi support (automatic mpd discovery)
         Default: ON
 
+    -DENABLE_UCHARDET=ON
+        Enable automatic encoding detection via uchardet
+        Default: ON
+
     Windows specific:
 
     -DCANTATA_WINDOWS_INSTALLER_DEST=<folder>
