@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 project(cantata)
 cmake_policy(SET CMP0020 NEW)
 
@@ -295,7 +295,7 @@ if (MUSICBRAINZ5_FOUND)
     endif ()
 endif ()
 
-include_directories(${CMAKE_SOURCE_DIR}/3rdparty ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QTINCLUDES} ${ZLIB_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR}/3rdparty ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QTINCLUDES})
 
 set(CANTATA_SRCS ${CANTATA_SRCS}
     gui/settings.cpp gui/application.cpp gui/initialsettingswizard.cpp gui/mainwindow.cpp gui/preferencesdialog.cpp gui/customactionssettings.cpp
@@ -557,7 +557,7 @@ add_subdirectory(support)
 add_subdirectory(3rdparty/qtiocompressor)
 add_subdirectory(streams/icons)
 add_subdirectory(online/icons)
-target_link_libraries(cantata support-core qtiocompressor ${CANTATA_LIBS} ${QTLIBS} ${ZLIB_LIBRARIES})
+target_link_libraries(cantata support-core qtiocompressor ${CANTATA_LIBS} ${QTLIBS} ZLIB::ZLIB)
 
 # enable warnings
 add_definitions(-DQT_NO_DEBUG_OUTPUT)
