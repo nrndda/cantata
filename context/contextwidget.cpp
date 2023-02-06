@@ -295,7 +295,7 @@ void ContextWidget::setWide(bool w)
         }
         QHBoxLayout *l=new QHBoxLayout(standardContext);
         standardContext->setLayout(l);
-        int m=l->margin()/2;
+        const QMargins margins = l->contentsMargins();
         l->setContentsMargins(0, 0, 0, 0);
         if (stack) {
             stack->setVisible(false);
@@ -307,7 +307,7 @@ void ContextWidget::setWide(bool w)
             album->setVisible(true);
             song->setVisible(true);
         }
-        l->addItem(new QSpacerItem(m, m, QSizePolicy::Fixed, QSizePolicy::Fixed));
+        l->addItem(new QSpacerItem(margins.left()/2, margins.top()/2, QSizePolicy::Fixed, QSizePolicy::Fixed));
         QByteArray state;
         bool resetSplitter=splitter;
         if (!splitter) {
@@ -336,7 +336,7 @@ void ContextWidget::setWide(bool w)
         }
         QGridLayout *l=new QGridLayout(standardContext);
         standardContext->setLayout(l);
-        int m=l->margin()/2;
+        const QMargins margins = l->contentsMargins();
         l->setContentsMargins(0, 0, 0, 0);
         l->setSpacing(0);
         if (!stack) {
@@ -361,7 +361,7 @@ void ContextWidget::setWide(bool w)
         stack->addWidget(artist);
         stack->addWidget(album);
         stack->addWidget(song);
-        l->addItem(new QSpacerItem(m, m, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, 0, 1, 1);
+        l->addItem(new QSpacerItem(margins.left()/2, margins.top()/2, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, 0, 1, 1);
         l->addWidget(stack, 0, 1, 1, 1);
         l->addWidget(viewSelector, 1, 0, 1, 2);
         QString lastSaved=Settings::self()->contextSlimPage();
@@ -623,9 +623,9 @@ void ContextWidget::update(const Song &s)
         if (!onlineContext) {
             QWidget *onlinePage=new QWidget(mainStack);
             QHBoxLayout *onlineLayout=new QHBoxLayout(onlinePage);
-            int m=onlineLayout->margin()/2;
+            const QMargins margins = onlineLayout->contentsMargins();
             onlineLayout->setContentsMargins(0, 0, 0, 0);
-            onlineLayout->addItem(new QSpacerItem(m, m, QSizePolicy::Fixed, QSizePolicy::Fixed));
+            onlineLayout->addItem(new QSpacerItem(margins.left()/2, margins.top()/2, QSizePolicy::Fixed, QSizePolicy::Fixed));
             onlineContext=new OnlineView(onlinePage);
             onlineLayout->addWidget(onlineContext);
             mainStack->addWidget(onlinePage);

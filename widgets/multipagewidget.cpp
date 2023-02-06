@@ -79,9 +79,9 @@ public:
         setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
         mainText->setText(t);
         subText->setText(s);
-        int minMargin = qMin(layout->margin(), 8);
+        int minMargin = qMin(layout->contentsMargins().left(), 8);
         layout->setContentsMargins(minMargin, minMargin, minMargin, minMargin);
-        setMinimumHeight(qMax(textSize, size)+(layout->margin()*2));
+        setMinimumHeight(qMax(textSize, size)+(layout->contentsMargins().top()*2));
         updateToolTip();
         setFocusPolicy(Qt::TabFocus);
     }
@@ -150,7 +150,7 @@ MultiPageWidget::MultiPageWidget(QWidget *p)
     mainLayout->addWidget(sizer);
     layout->setSpacing(0);
     layout->setSizeConstraint(QLayout::SetMinimumSize);
-    int minMargin = qMin(layout->margin(), 4);
+    int minMargin = qMin(layout->contentsMargins().left(), 4);
     layout->setContentsMargins(minMargin, minMargin, minMargin, minMargin);
     #ifdef Q_OS_MAC
     // TODO: This feels a bt of a hack...
