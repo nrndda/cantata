@@ -1,5 +1,3 @@
-INCLUDE(MacroOptionalFindPackage)
-INCLUDE(MacroLogFeature)
 
 add_subdirectory( ifaces )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}  ${QTINCLUDES})
@@ -46,8 +44,13 @@ set(solidlite_LIB_SRCS
 )
 
    if (NOT WIN32 AND NOT APPLE AND WITH_SOLID_UDISKS2)
-     find_package( UDev REQUIRED)
-     macro_log_feature( UDEV_FOUND "UDev" "UDev support for Solid" "http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html" FALSE "" "Allows Solid to use UDev to provide information about devices on Linux" )
+     find_package(UDev)
+     set_package_properties(UDev PROPERTIES
+        DESCRIPTION "UDev"
+        PURPOSE "UDev support for Solid"
+        URL "http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html"
+        TYPE REQUIRED
+     )
    endif()
    configure_file( config-solid.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-solid.h )
 
@@ -65,29 +68,12 @@ set(solidlite_LIB_SRCS
       backends/shared/udevqtdevice.cpp
       )
 
-      # check for media-player-info (runtime-only optional dependency)
-      set(XDG_DATA_DIRS_ENV $ENV{XDG_DATA_DIRS})  # if(ENV{..}) does not work for me
-      if(XDG_DATA_DIRS_ENV)
-         find_path(MEDIAPLAYERINFO_PATH sony_psp.mpi
-            PATHS ENV XDG_DATA_DIRS
-            PATH_SUFFIXES "media-player-info" NO_DEFAULT_PATH
-         )
-      else()
-         set(XDG_DATA_DIRS "/usr/share")
-         message(STATUS "Warning: environment variable XDG_DATA_DIRS not set, falling back to ${XDG_DATA_DIRS}")
-         find_path(MEDIAPLAYERINFO_PATH sony_psp.mpi
-            PATHS "${XDG_DATA_DIRS}"
-            PATH_SUFFIXES "media-player-info" NO_DEFAULT_PATH
-         )
-      endif()
-
-      macro_log_feature(MEDIAPLAYERINFO_PATH
-         "media-player-info"
-         "Enables identification and querying of portable media players"
-         "http://www.freedesktop.org/wiki/Software/media-player-info"
-         FALSE
-         ""
-         "Runtime-only dependency of the udev solid backend. Support for m-p-i is included even if not found during build"
+      find_package(MediaPlayerInfo)
+      set_package_properties(MediaPlayerInfo PROPERTIES
+         DESCRIPTION "A repository of data files describing media player capabilities"
+         PURPOSE "Enables identification and querying of portable media players"
+         URL "http://www.freedesktop.org/wiki/Software/media-player-info"
+         TYPE RUNTIME
       )
    endif( )
 

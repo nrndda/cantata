@@ -42,7 +42,7 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CANTATA_VERSION_WITH
 set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CANTATA_VERSION_WITH_SPIN}")
 set(CPACK_SOURCE_IGNORE_FILES  "/.svn/;/.git/;.gitignore;.github/;.project;CMakeLists.txt.user;README.md;/screenshots/")
 include(CPack)
-include(MacroLogFeature)
+include(FeatureSummary)
 
 option(ENABLE_TAGLIB "Enable TagLib library (required for tag editing, replaygain calculation, device support, etc)" ON)
 option(ENABLE_UCHARDET "Enable CUE playlists charset discovery via app-i18n/uchardet" ON)
@@ -81,7 +81,12 @@ endif()
 
 if(ENABLE_AVAHI)
     find_package(Avahi)
-    macro_log_feature(AVAHI_FOUND "Avahi Support" "Automatic MPD-Server Detection" "https://www.avahi.org/" FALSE "" "")
+    set_package_properties(Avahi PROPERTIES
+        DESCRIPTION "Service Discovery using mDNS/DNS-SD"
+        PURPOSE "Automatic MPD-Server Detection"
+        URL "https://www.avahi.org/"
+        TYPE OPTIONAL
+    )
 endif()
 
 if (AVAHI_FOUND)
@@ -139,32 +144,54 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT APPLE AND NOT WIN32 AND 
 endif ()
 
 if (ENABLE_TAGLIB)
-    if (NOT TAGLIB_FOUND)
-        set(TAGLIB_MIN_VERSION "1.6")
-        find_package(Taglib)
-    endif()
-    macro_log_feature(TAGLIB_FOUND "TagLib" "Tag editor, file organiser, etc." "http://taglib.github.io/")
-endif ()
+    find_package(Taglib 1.6)
+    set_package_properties(Taglib PROPERTIES
+        DESCRIPTION "Audio Meta-Data Library"
+        PURPOSE "Needed for tag editor, file organiser, etc."
+        URL "https://taglib.org/"
+        TYPE OPTIONAL
+    )
+endif()
 
 if (TAGLIB_FOUND)
     if (ENABLE_DEVICES_SUPPORT AND (ENABLE_CDIOPARANOIA OR ENABLE_CDPARANOIA))
         # Issue 1021 - prefer libcdio_paranoia over plain cdparanoia
         if (ENABLE_CDIOPARANOIA)
             find_package(Cdioparanoia)
-            macro_log_feature(CDIOPARANOIA_FOUND "libcdio_paranoia" "CD ripping." "https://www.gnu.org/software/libcdio/")
+            set_package_properties(Cdioparanoia PROPERTIES
+                DESCRIPTION "CD paranoia on top of libcdio"
+                PURPOSE "CD ripping"
+                URL "https://www.gnu.org/software/libcdio/"
+                TYPE OPTIONAL
+            )
         endif()
         if (NOT CDIOPARANOIA_FOUND)
             find_package(Cdparanoia)
-            macro_log_feature(CDPARANOIA_FOUND "libcdda_paranoia" "CD ripping." "http://www.xiph.org/paranoia")
+            set_package_properties(Cdparanoia PROPERTIES
+                DESCRIPTION "Extracts audio from compact discs directly as data"
+                PURPOSE "CD ripping"
+                URL "https://www.xiph.org/paranoia/"
+                TYPE OPTIONAL
+            )
         endif()
         if (CDIOPARANOIA_FOUND OR CDPARANOIA_FOUND)
             if (ENABLE_CDDB)
                 find_package(CDDB)
-                macro_log_feature(CDDB_FOUND "libcddb" "CD info retrieval via CDDB." "http://libcddb.sourceforge.net")
+                set_package_properties(CDDB PROPERTIES
+                    DESCRIPTION "A C library to access data on a CDDB server"
+                    PURPOSE "CD info retrieval"
+                    URL "https://libcddb.sourceforge.net/"
+                    TYPE OPTIONAL
+                )
             endif ()
             if (ENABLE_MUSICBRAINZ)
                 find_package(MusicBrainz5)
-                macro_log_feature(MUSICBRAINZ5_FOUND "libmusicbrainz5" "CD info retrieval via MusicBrainz." "http://musicbrainz.org/doc/libmusicbrainz")
+                set_package_properties(MusicBrainz5 PROPERTIES
+                    DESCRIPTION "Client library to look up music metadata from Musicbrainz web service"
+                    PURPOSE "CD info retrieval via MusicBrainz"
+                    URL "https://musicbrainz.org/doc/libmusicbrainz"
+                    TYPE OPTIONAL
+                )
             endif ()
         endif ()
     endif ()
@@ -176,15 +203,30 @@ if (TAGLIB_FOUND)
 
     if (ENABLE_FFMPEG)
         find_package(FFMPEG)
-        macro_log_feature(FFMPEG_FOUND "libavcodec/libavutil/libavformat" "ReplayGain calculation." "http://ffmpeg.org")
+        set_package_properties(FFMPEG PROPERTIES
+            DESCRIPTION "libavcodec/libavutil/libavformat"
+            PURPOSE "ReplayGain calculation"
+            URL "https://ffmpeg.org/"
+            TYPE OPTIONAL
+        )
     endif ()
     if (ENABLE_MPG123)
         find_package(MPG123)
-        macro_log_feature(MPG123_FOUND "libmpg123" "ReplayGain calculation." "http://www.mpg123.de")
+        set_package_properties(MPG123 PROPERTIES
+            DESCRIPTION "A decoder/player for mono/stereo mpeg audio files"
+            PURPOSE "ReplayGain calculation"
+            URL "https://www.mpg123.de/"
+            TYPE OPTIONAL
+        )
     endif ()
     if (ENABLE_MTP AND ENABLE_DEVICES_SUPPORT AND NOT WIN32 AND NOT APPLE)
         find_package(Mtp)
-        macro_log_feature(MTP_FOUND "libmtp" "MTP Device Support." "http://libmtp.sourceforge.net")
+        set_package_properties(Mtp PROPERTIES
+            DESCRIPTION "libmtp"
+            PURPOSE "MTP Device Support"
+            URL "https://libmtp.sourceforge.net"
+            TYPE OPTIONAL
+        )
     endif ()
 else (TAGLIB_FOUND)
    set(ENABLE_DEVICES_SUPPORT OFF)
@@ -241,13 +283,23 @@ endif ()
 if (ENABLE_HTTP_STREAM_PLAYBACK)
     if (ENABLE_LIBVLC)
         find_package(LIBVLC REQUIRED)
-        macro_log_feature(LIBVLC_FOUND "libVLC" "MPD HTTP stream playback." "http://videolan.org")
+        set_package_properties(LIBVLC PROPERTIES
+            DESCRIPTION "libVLC"
+            PURPOSE "MPD HTTP stream playback"
+            URL "https://videolan.org/"
+            TYPE OPTIONAL
+        )
         add_definitions(-DLIBVLC_FOUND)
         include_directories(${LIBVLC_INCLUDE_DIR})
         set(CANTATA_LIBS ${CANTATA_LIBS} ${LIBVLC_LIBRARY})
     else ()
         find_package(Qt5 ${QT_MIN_VERSION} COMPONENTS Multimedia REQUIRED)
-        macro_log_feature(Qt5Multimedia_FOUND "Qt5Multimedia" "MPD HTTP stream playback." "http://qtproject.org")
+        set_package_properties(Qt5Multimedia PROPERTIES
+            DESCRIPTION "Qt5Multimedia"
+            PURPOSE "MPD HTTP stream playback"
+            URL  "https://www.qt.io/"
+            TYPE OPTIONAL
+        )
         include_directories(${Qt5Multimedia_INCLUDE_DIRS})
         add_definitions(${Qt5Multimedia_DEFINITIONS})
         set(CANTATA_LIBS ${CANTATA_LIBS} ${Qt5Multimedia_LIBRARIES})
@@ -580,7 +632,7 @@ if (NOT WIN32 AND NOT APPLE AND NOT HAIKU)
     add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake)
 endif ()
 
-macro_display_feature_log()
+feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
 if ( (NOT WIN32 AND NOT APPLE AND ( (NOT ENABLE_SIMPLE_MPD_SUPPORT)  OR (NOT ENABLE_DEVICES_SUPPORT) OR (ENABLE_DEVICES_SUPPORT AND NOT ENABLE_REMOTE_DEVICES) ) ) OR (NOT ENABLE_HTTP_STREAM_PLAYBACK) OR (NOT ENABLE_PROXY_CONFIG))
     message("-----------------------------------------------------------------------------")
