@@ -39,7 +39,6 @@ namespace Solid
     class SOLID_EXPORT StorageVolume : public DeviceInterface
     {
         Q_OBJECT
-        Q_ENUMS(UsageType)
         Q_PROPERTY(bool ignored READ isIgnored)
         Q_PROPERTY(UsageType usage READ usage)
         Q_PROPERTY(QString fsType READ fsType)
@@ -60,6 +59,7 @@ namespace Solid
          * - Unused : An unused or free volume
          */
         enum UsageType { Other = 0, Unused = 1, FileSystem = 2, PartitionTable = 3, Raid = 4, Encrypted = 5 };
+        Q_ENUM(UsageType)
 
 
     private:

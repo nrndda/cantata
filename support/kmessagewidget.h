@@ -91,7 +91,6 @@ class SqueezedTextLabel;
 class KMsgWidget : public QFrame
 {
     Q_OBJECT
-    Q_ENUMS(MessageType)
 
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(bool wordWrap READ wordWrap WRITE setWordWrap)
@@ -104,6 +103,7 @@ public:
         Warning,
         Error
     };
+    Q_ENUM(MessageType)
 
     /**
      * Constructs a KMsgWidget with the specified parent.

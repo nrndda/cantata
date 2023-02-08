@@ -44,7 +44,6 @@ namespace Solid
     class SOLID_EXPORT DeviceInterface : public QObject
     {
         Q_OBJECT
-        Q_ENUMS(Type)
         Q_DECLARE_PRIVATE(DeviceInterface)
 
     public:
@@ -74,6 +73,7 @@ namespace Solid
                     Button = 14, AudioInterface = 15, DvbInterface = 16, Video = 17,
                     SerialInterface = 18, SmartCardReader = 19, InternetGateway = 20,
                     NetworkShare = 21, */ Last = 0xffff  };
+        Q_ENUM(Type)
 
         /**
          * Destroys a DeviceInterface object.

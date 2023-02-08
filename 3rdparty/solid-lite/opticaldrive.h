@@ -42,7 +42,6 @@ namespace Solid
     class SOLID_EXPORT OpticalDrive : public StorageDrive
     {
         Q_OBJECT
-        Q_ENUMS(MediumType)
         Q_FLAGS(MediumTypes)
         Q_PROPERTY(MediumTypes supportedMedia READ supportedMedia)
         Q_PROPERTY(int readSpeed READ readSpeed)
@@ -77,6 +76,7 @@ namespace Solid
                           Dvdplusrw=0x00080, Dvdplusdl=0x00100, Dvdplusdlrw=0x00200,
                           Bd=0x00400, Bdr=0x00800, Bdre=0x01000,
                           HdDvd=0x02000, HdDvdr=0x04000, HdDvdrw=0x08000 };
+        Q_ENUM(MediumType)
 
         /**
          * This type stores an OR combination of MediumType values.

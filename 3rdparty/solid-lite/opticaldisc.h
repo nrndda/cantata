@@ -38,7 +38,6 @@ namespace Solid
     class SOLID_EXPORT OpticalDisc : public StorageVolume
     {
         Q_OBJECT
-        Q_ENUMS(ContentType DiscType)
         Q_FLAGS(ContentTypes)
         Q_PROPERTY(ContentTypes availableContent READ availableContent)
         Q_PROPERTY(DiscType discType READ discType)
@@ -68,6 +67,7 @@ namespace Solid
             VideoDvd = 0x10,
             VideoBluRay = 0x20
         };
+        Q_ENUM(ContentType)
 
         /**
          * This type stores an OR combination of ContentType values.
@@ -103,6 +103,7 @@ namespace Solid
                         DvdPlusRecordableDuallayer, DvdPlusRewritableDuallayer,
                         BluRayRom, BluRayRecordable, BluRayRewritable,
                         HdDvdRom, HdDvdRecordable, HdDvdRewritable };
+        Q_ENUM(DiscType)
 
 
     private:

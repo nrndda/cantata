@@ -73,7 +73,6 @@ class QMenu;
 
 class Dialog : public QDialog {
     Q_OBJECT
-    Q_ENUMS(ButtonCode)
 
 public:
 
@@ -109,6 +108,7 @@ public:
       NoDefault = 0x00008000 ///< Used when specifying a default button; indicates that no button should be marked by default.
     };
     Q_DECLARE_FLAGS(ButtonCodes, ButtonCode)
+    Q_ENUM(ButtonCode)
     enum ButtonPopupMode
     {
       InstantPopup = 0,
