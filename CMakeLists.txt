@@ -45,7 +45,7 @@ include(CPack)
 include(FeatureSummary)
 
 option(ENABLE_TAGLIB "Enable TagLib library (required for tag editing, replaygain calculation, device support, etc)" ON)
-option(ENABLE_UCHARDET "Enable CUE playlists charset discovery via app-i18n/uchardet" ON)
+option(ENABLE_UCHARDET "Enable CUE playlists charset discovery via uchardet" ON)
 option(ENABLE_HTTP_STREAM_PLAYBACK "Enable playback of MPD HTTP streams (LibVLC or QtMultimedia)" ON)
 option(ENABLE_FFMPEG "Enable ffmpeg/libav libraries (required for replaygain calculation)" ON)
 option(ENABLE_MPG123 "Enable mpg123 libraries (required for replaygain calculation)" ON)
@@ -91,7 +91,6 @@ endif()
 
 if (AVAHI_FOUND)
     set(CANTATA_SRCS ${CANTATA_SRCS} gui/findmpddialog.cpp gui/avahidiscovery.cpp gui/avahipoll.cpp)
-
     set(CANTATA_LIBS ${CANTATA_LIBS} ${AVAHI_LIBRARIES})
 endif()
 
@@ -237,11 +236,19 @@ if (NOT MTP_FOUND)
 endif ()
 
 if (ENABLE_UCHARDET)
-    find_package(UCHARDET REQUIRED)
-    macro_log_feature(UCHARDET_FOUND "uchardet" "An encoding detector library" "https://www.freedesktop.org/wiki/Software/uchardet/")
-    include_directories(${UCHARDET_INCLUDE_DIR})
-    set(CANTATA_LIBS ${CANTATA_LIBS} ${UCHARDET_LIBS})
-    set(CANTATA_SRCS ${CANTATA_SRCS} support/uchardet.cpp)
+   find_package(UCHARDET)
+   set_package_properties(UCHARDET PROPERTIES
+       DESCRIPTION "uchardet"
+       PURPOSE "An encoding detector library"
+       URL "https://www.freedesktop.org/wiki/Software/uchardet"
+       TYPE OPTIONAL
+   )
+endif ()
+
+if (CHARDET_FOUND)
+   include_directories(${UCHARDET_INCLUDE_DIR})
+   set(CANTATA_LIBS ${CANTATA_LIBS} ${UCHARDET_LIBS})
+   set(CANTATA_SRCS ${CANTATA_SRCS} support/uchardet.cpp)
 endif ()
 
 
