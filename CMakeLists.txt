@@ -245,7 +245,7 @@ if (ENABLE_UCHARDET)
    )
 endif ()
 
-if (CHARDET_FOUND)
+if (UCHARDET_FOUND)
    include_directories(${UCHARDET_INCLUDE_DIR})
    set(CANTATA_LIBS ${CANTATA_LIBS} ${UCHARDET_LIBS})
    set(CANTATA_SRCS ${CANTATA_SRCS} support/uchardet.cpp)
