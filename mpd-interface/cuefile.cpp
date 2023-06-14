@@ -256,12 +256,12 @@ bool CueFile::parse(const QString &fileName, const QString &dir, QList<Song> &so
     // CUE file stream
     QScopedPointer<QTextStream> textStream;
     QString decoded;
-    const char *uchardetCodec;
     QFile f(dir+fileName);
     if (f.open(QIODevice::ReadOnly)) {
         // First attempt to use QTextDecoder to decode cue file contents into a QString
         QByteArray contents=f.readAll();
-        #ifdef UCHARDET_FOUND 
+        #ifdef UCHARDET_FOUND
+        const char *uchardetCodec;
         uchardetCodec = UCHARDET::detectedEncoding(contents);
         if (uchardetCodec != NULL) {
             DBUG << "uchardet decoder: " << uchardetCodec;
